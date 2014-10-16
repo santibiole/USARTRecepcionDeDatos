@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g -nostartfiles -Map=USART-RecepcionDeDatos.map -O0 --gc-sections -LC:\CooCox\CoIDE\configuration\ProgramData\USART-RecepcionDeDatos -TC:\CooCox\CoIDE\configuration\ProgramData\USART-RecepcionDeDatos/arm-gcc-link.ld -g">
+      <target file="USART-RecepcionDeDatos.elf" lastModified="14919139844">
+         <source file="..\obj\stm32f4xx_syscfg.o" lastModified="1491912ea33"/>
+         <source file="..\obj\stm32f4xx_usart.o" lastModified="1491912eaf7"/>
+         <source file="..\obj\startup_stm32f4xx.o" lastModified="1491912ebb3"/>
+         <source file="..\obj\main.o" lastModified="14919139643"/>
+         <source file="..\obj\stm32f4xx_rcc.o" lastModified="1491912ecf7"/>
+         <source file="..\obj\stm32f4xx_adc.o" lastModified="1491912edd9"/>
+         <source file="..\obj\stm32f4xx_gpio.o" lastModified="1491912ee65"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="1491912eecd"/>
+         <source file="..\obj\syscalls.o" lastModified="1491912ef61"/>
+         <source file="..\obj\stm32f4xx_spi.o" lastModified="1491912efec"/>
+         <source file="..\obj\bsp.o" lastModified="1491912f07a"/>
+         <source file="..\obj\stm32f4xx_exti.o" lastModified="1491912f112"/>
+         <source file="..\obj\misc.o" lastModified="1491912f17d"/>
+         <source file="..\obj\stm32f4xx_tim.o" lastModified="1491912f2c0"/>
+      </target>
+   </processor>
+</history>
