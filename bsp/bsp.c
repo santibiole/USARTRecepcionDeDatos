@@ -41,6 +41,7 @@ const uint16_t leds[] = {LED_1, LED_2, LED_3, LED_4, LED_5, LED_6, LED_7, LED_8,
  */
 extern void APP_ISR_sw (void);
 extern void APP_ISR_1ms (void);
+extern void APP_ISR_uartrx (void);
 
 volatile uint16_t bsp_count_ms = 0; // Defino como volatile para que el compilador no interprete el while(bsp_count_ms) como un bucle infinito.
 
@@ -62,13 +63,16 @@ void bsp_delay_ms(uint16_t x) {
 }
 
 void uart_tx (char data) {
-	while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == SET){
-			USART_SendData(USART3,data);
+	while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET){
 	}
+	USART_SendData(USART3,data);
 }
 
-uint16_t uart_rx (void) {
-	return USART_ReceiveData(USART3);
+char uart_rx (void) {
+	char data;
+	data = USART_ReceiveData(USART3);
+    USART_SendData(USART3, data);
+    return data;
 }
 
 uint8_t sw_getState(void) {
@@ -91,7 +95,7 @@ void EXTI0_IRQHandler(void) {
 	if (EXTI_GetITStatus(EXTI_Line0) != RESET) { //Verificamos si es la del pin configurado.
 		EXTI_ClearFlag(EXTI_Line0); // Limpiamos la Interrupcion.
 		// Rutina:
-		APP_ISR_sw();
+		//APP_ISR_sw();
 		//GPIO_ToggleBits(leds_port[1], leds[1]);
 	}
 }
@@ -110,6 +114,17 @@ void TIM2_IRQHandler(void) {
 			bsp_count_ms--;
 		}
 	}
+}
+
+/**
+ * @brief Interrupcion llamada cuando se recbie un dato por UART3
+ */
+void USART3_IRQHandler(void) {
+		if (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) != RESET) {
+                USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+
+    			APP_ISR_uartrx();
+        }
 }
 
 void bsp_led_init();
@@ -295,4 +310,14 @@ void bsp_init_usart() {
 
 	// Habilito la Usart
 	USART_Cmd(USART3, ENABLE);
+
+	// Habilito interrupción de USART RX
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
+	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
 }

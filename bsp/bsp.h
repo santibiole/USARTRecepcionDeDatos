@@ -51,7 +51,7 @@ void uart_tx (char data);
  *
  * @retval Dato recibido
  */
-uint16_t uart_rx (void);
+char uart_rx (void);
 
 /**
  * @brief Lectura del switch
