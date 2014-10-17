@@ -6,6 +6,7 @@
 /* Variables utilizadas en recepcion de datos a traves de la UART */
 #define TAM_RX_BUFFER 7
 #define TAM_RX_TRAMA_ENCABEZADO 3
+#define ASCII_A_DECIMAL 48
 
 union u_rx {
 	struct str_trama{
@@ -16,10 +17,10 @@ union u_rx {
 		uint8_t fin_trama;
 	}trama;
 
-	char buffer[TAM_RX_BUFFER];
+	uint8_t buffer[TAM_RX_BUFFER];
 }rx;
 
-//static uint8_t rx_dato_disponible = 0;
+static uint8_t rx_dato_disponible = 0;
 
 /**
  * @brief Delay por software
@@ -50,6 +51,9 @@ int main(void) {
 
 	while (1) {
 
+		if(rx_dato_disponible==1 && rx.trama.fin_trama == 0xD){
+				analizar_trama_rx();
+		}
 	}
 }
 
@@ -66,11 +70,11 @@ void delay(volatile uint32_t nCount) {
 }
 
 void APP_ISR_uartrx (void){
-    char data;
+	uint8_t data;
 	int i;
 
 	/*Levanto bandera de dato disponible en UART RX*/
-	//rx_dato_disponible = 1;
+	rx_dato_disponible = 1;
 
 	/*Cargo dato disponible en "data"*/
 	data = uart_rx();
@@ -79,21 +83,20 @@ void APP_ISR_uartrx (void){
 		rx.buffer[i] = rx.buffer[i + 1];
 	}
 	rx.buffer[TAM_RX_BUFFER-1] = data;
-	if (rx.trama.fin_trama == 0xD) {
-		analizar_trama_rx();
-	}
 }
 
 void analizar_trama_rx (void) {
-	if (strncmp("LED",rx.trama.encabezado,3)) {
-		if (strncmp(":",&rx.trama.dos_p,1)) {
-			if (strncmp("1",&rx.trama.estado,1)){
-				led_on(rx.trama.led_n);
+
+	if (strncmp("LED",(char *)&rx.trama.encabezado[0],3)==0) {
+		if (strncmp(":",(char *)&rx.trama.dos_p,1)==0) {
+			if (strncmp("1",(char *)&rx.trama.estado,1)==0){
+				led_on(rx.trama.led_n-ASCII_A_DECIMAL);
 			} else {
-				led_off(rx.trama.led_n);
+				led_off(rx.trama.led_n-ASCII_A_DECIMAL);
 			}
 		}
 	}
+	rx_dato_disponible=0;
 }
 
 void APP_ISR_sw (void){

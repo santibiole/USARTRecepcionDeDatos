@@ -120,10 +120,9 @@ void TIM2_IRQHandler(void) {
  * @brief Interrupcion llamada cuando se recbie un dato por UART3
  */
 void USART3_IRQHandler(void) {
-		if (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) != RESET) {
-                USART_ClearITPendingBit(USART3, USART_IT_RXNE);
-
-    			APP_ISR_uartrx();
+		if (USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == SET) {
+			USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+			APP_ISR_uartrx();
         }
 }
 
@@ -298,7 +297,7 @@ void bsp_init_usart() {
 	GPIO_PinAFConfig(GPIOD, GPIO_PinSource9, GPIO_AF_USART3);
 
 	//Configuro UART
-	USART_InitStructure.USART_BaudRate = 9600;
+	USART_InitStructure.USART_BaudRate = 115200;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No;
